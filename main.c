@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
-#include "util.h"
+
 
 
 char *lv = "│   ";
@@ -67,7 +67,7 @@ int tree( char *path) {
     return 0;
 }
 int main() {
-    tree("/");
+    tree("/system/vsh/");
     return 0;
     
 }
