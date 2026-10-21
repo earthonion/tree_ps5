@@ -14,14 +14,14 @@ all: $(ELF)
 
 LDADD := -lSceNotification
 
-SRCS := main.c
+SRCS := main.c util.c
 
 $(ELF): $(SRCS) $(PAYLOAD_OBJS)
 	$(CC) $(CFLAGS) -o $@ $(LDADD) $(SRCS) $(PAYLOAD_OBJS)
 	
 
 test:
-	nc -q 0 192.168.0.134 9021 < $(ELF)
+	nc -q 0 192.168.0.125 9021 < $(ELF)
 
 clean:
 	rm -f $(ELF)
