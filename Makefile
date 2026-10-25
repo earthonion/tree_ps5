@@ -14,7 +14,7 @@ all: $(ELF)
 
 LDADD := -lSceNotification
 
-SRCS := main.c util.c
+SRCS := main.c
 
 $(ELF): $(SRCS) $(PAYLOAD_OBJS)
 	$(CC) $(CFLAGS) -o $@ $(LDADD) $(SRCS) $(PAYLOAD_OBJS)
