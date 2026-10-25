@@ -9,10 +9,8 @@
 
 
 char *lv = "│   ";
-char *t = "├── ";
-char *b = "└"; 
 
-void gen_branch(char *path, char **branch){
+void gen_branch(int last, char *path, char **branch){
     
     int level = 0;
     for(int i = 0; i < strlen(path); i++){
@@ -21,7 +19,11 @@ void gen_branch(char *path, char **branch){
         }
     }
     
-    char *cur_branch = "├── ";
+    char *cur_branch = "├─ ";
+    
+    if(last){
+        cur_branch = "└─ "; 
+    }
     for(int i = 0; i < level-1; i++) {
         char *new_branch = NULL;
         asprintf(&new_branch, "%s%s", lv, cur_branch);
@@ -34,40 +36,59 @@ void gen_branch(char *path, char **branch){
 
 
 
-int tree( char *path) {
+int tree( char *path, int *dir_cnt, int *file_cnt) {
+    
     DIR *dir = opendir(path);
     if(!dir) {printf("err path: %s\n", path);}
     struct dirent *entry = NULL;
     
     while((entry = readdir(dir)) != NULL) {
         
+        int last = 0;
+        
+        long int curdir_idx = telldir(dir);
+        seekdir(dir, curdir_idx +1);
+        if (readdir(dir) == NULL) {
+            last = 1;
+        }
+        seekdir(dir, curdir_idx);
         
         if(strcmp(entry->d_name, "..") && strcmp(entry->d_name, ".")) {
             if(entry->d_type == DT_DIR){
+                (*dir_cnt)++;
                 char newpath[PATH_MAX];
                 snprintf(newpath, sizeof(newpath), "%s/%s", path, entry->d_name);
                 
                 char *b = NULL;
-                gen_branch(path, &b);
+                gen_branch(last,path, &b);
                 
                 printf("%s%s\n", b, entry->d_name);
                 
-                tree(newpath);
+                tree(newpath, dir_cnt, file_cnt);
             }
             else {
+                (*file_cnt)++;
                 char *b = NULL;
-                gen_branch(path, &b);
+                gen_branch(last,path, &b);
                 
                 printf("%s%s\n", b, entry->d_name);
             }
         }
-    } 
+    }
+    
+     
     
     closedir(dir);
     return 0;
 }
 int main() {
-    tree("/system/vsh/");
+    int dc = 0;
+    int fc = 0;
+    
+    tree("/dev", &dc, &fc);
+    
+    printf("\n%d directories %d files\n", (int)dc, (int)fc);
+    
     return 0;
     
 }
